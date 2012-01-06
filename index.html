@@ -1,0 +1,190 @@
+<!DOCTYPE HTML> 
+<html> 
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Nixie+One">
+    <title>Sound Test</title>
+    <style type="text/css"> 
+        body {
+            background-color: #000;
+            text-align:center;
+            margin: 0px;
+            overflow: hidden;
+        }
+        #info {
+            font-family: "Nixie One", Helvetica, Arial, sans-serif;
+            text-shadow: 0.15em 0.15em 0.2em #333;
+            font-size: 28px;
+            line-height: 1.6em;
+            margin-top: 15px;
+            margin-bottom: 0px;
+        }
+        #paintDevice {
+            position: relative;
+            border: 3px solid;
+            border-radius: 20px;
+            padding: 16px;
+            margin: 15px;
+        }
+
+    </style>
+
+    <script type="text/javascript" src="js/loader.js"></script>
+    <script type="text/javascript">
+
+  
+    window.onload = function() {
+        
+        var ctx;
+        var audioCtx;
+                
+        function errorMessage(msg) {
+            console.log(msg);
+        }
+        
+        function init() {
+           
+            document.getElementById('openSoundFile').addEventListener('change', openFile, false);
+            
+            canvas = document.getElementById("paintDevice");
+            ctx = canvas.getContext('2d');
+            canvas.width  = window.innerWidth * 0.9;
+            canvas.height = window.innerHeight * 0.75;
+
+            audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
+            
+            if (!(ctx && audioCtx)) {
+                errorMessage("Missing canvas and/or audio api =(");
+                return;
+            }
+   
+            ctx.strokeStyle = "hsl(720, 100%, 50%)";
+            ctx.fillStyle = document.body.style.backgroundColor;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = "round";
+    
+        }
+
+        function processAudioData(nodes) {
+        
+            var analyzerNode = audioCtx.createAnalyser();
+            analyzerNode.fftSize = fftSize;
+            analyzerNode.smoothingTimeConstant = 0.75;
+            nodes.push(analyzerNode);
+            
+            var oldHue = -1;
+            var runner = 0;
+
+            var fftSize = 750;
+            var border = fftSize;
+
+            var data = new Uint8Array(fftSize);
+         
+            var lines = 250;
+            var samplesPerLine = Math.floor(border / lines);
+            var step = (Math.PI * 8) / (border / samplesPerLine);
+            
+            window.setInterval(function() {
+                            
+                ctx.save();
+                ctx.beginPath();
+                
+                ctx.globalAlpha = 0.15;
+                //ctx.rect(8, 8, canvas.width - 16, canvas.height - 16); // 8/16 to avoid a border endering bug in webkit
+                ctx.rect(0, 0, canvas.width, canvas.height);
+                ctx.fill();
+                ctx.globalAlpha = 0.15;
+                
+                ctx.beginPath();
+                var sum  = 0, len = 0, rot = 0;
+                analyzerNode.getByteFrequencyData(data);
+
+                //var samplesPerLine = Math.floor(data.length / lines);
+                ctx.moveTo(canvas.width * 0.5, canvas.height * 0.5);
+                for (var j=0; j < border; j++) {
+                    sum += data[j];
+                    if ((j + 1) % samplesPerLine === 0) {
+                        len = sum / samplesPerLine;
+                        var scaledLenX = (len / 256) * (canvas.width * 0.75);
+                        var scaledLenY = (len / 256) * (canvas.height);
+                        //console.log("sum is: " + sum + " and j is " + j + " and scaledLen is therefore: " + scaledLen);
+                        var x = (canvas.width * 0.5) - (scaledLenX * Math.cos(rot));
+                        var y = (canvas.height  * 0.5) - (scaledLenY * Math.sin(rot));
+                        if ((j + 1) === samplesPerLine) {
+                            ctx.moveTo(x, y);
+                            var hue = (len / 256) * 360;
+                            if ((runner > 25) && (((hue - oldHue) < 75) || (oldHue === -1))) {
+                                ctx.strokeStyle = "hsl(" + hue + ", 100%, 50%)";
+                                oldHue = hue;
+                            }
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                        sum = 0;
+                        runner++;
+                        rot += step;
+                    }
+                }
+                ctx.moveTo(canvas.width * 0.5, canvas.height * 0.5);
+                ctx.stroke();                                
+                                
+            }, 50);  //setInterval
+            
+        }
+        
+        function play(rawBuffer) {
+            
+            var nodes = new Array;
+            var mucke = audioCtx.createBuffer(rawBuffer, false);
+            mucke.gain = 1.0;
+            //console.log("Sample Rate: " + mucke.sampleRate);
+            //console.log("length: " + mucke.length);
+            //console.log("duration: " + mucke.duration);
+            //console.log("channels: " + mucke.numberOfCannels);
+
+            var source = audioCtx.createBufferSource();
+            source.buffer = mucke;  
+            nodes.push(source);
+                                               
+            //var filter = audioCtx.createBiquadFilter();
+            //filter.type = 0;
+            //filter.frequency.value = 880;
+            //nodes.push(filter);
+            
+            processAudioData(nodes);
+            
+            for (var i=0; i<nodes.length; i++) {
+                    if (i === nodes.length - 1) {
+                            nodes[i].connect(audioCtx.destination);
+                    } else {
+                            nodes[i].connect(nodes[i + 1]);
+                    }
+            }
+            
+            nodes[0].noteOn(0);
+            
+        }
+                
+        function openFile(evt) {
+            Loader.loadFile(evt.target.files, play, errorMessage);
+        }
+        
+        init();
+        
+    }
+        
+    </script>
+</head>
+
+<body>
+<div id="info">
+    =) <br />
+<input id="openSoundFile" type="file" />
+</div>
+<canvas id="paintDevice" width="800" height="600" >
+    Your browser doesn't support the HTML5 Canvas element.
+</canvas>
+
+</body>
+</html>
+
