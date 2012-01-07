@@ -68,25 +68,26 @@
         function processAudioData(nodes) {
         
             var analyzerNode = audioCtx.createAnalyser();
-            analyzerNode.fftSize = fftSize;
-            analyzerNode.smoothingTimeConstant = 0.75;
-            nodes.push(analyzerNode);
             
+            var hue;
             var oldHue = -1;
             var runner = 0;
 
             var fftSize = 750;
-            var border = fftSize;
+            var border = 750;
 
             var data = new Uint8Array(fftSize);
          
             var lines = 250;
             var samplesPerLine = Math.floor(border / lines);
-            var step = (Math.PI * 8) / (border / samplesPerLine);
+            var step = (Math.PI * 8) / lines;
+
+            analyzerNode.fftSize = fftSize;
+            analyzerNode.smoothingTimeConstant = 0.75;
+            nodes.push(analyzerNode);
             
             window.setInterval(function() {
-                            
-                ctx.save();
+
                 ctx.beginPath();
                 
                 ctx.globalAlpha = 0.15;
@@ -98,26 +99,30 @@
                 ctx.beginPath();
                 var sum  = 0, len = 0, rot = 0;
                 analyzerNode.getByteFrequencyData(data);
-
-                //var samplesPerLine = Math.floor(data.length / lines);
+                
+                ctx.save();
                 ctx.moveTo(canvas.width * 0.5, canvas.height * 0.5);
                 for (var j=0; j < border; j++) {
                     sum += data[j];
                     if ((j + 1) % samplesPerLine === 0) {
                         len = sum / samplesPerLine;
-                        var scaledLenX = (len / 256) * (canvas.width * 0.75);
-                        var scaledLenY = (len / 256) * (canvas.height);
+                        var scaledLenX = (len / 255) * (canvas.width * 0.75);
+                        var scaledLenY = (len / 255) * (canvas.height);
                         //console.log("sum is: " + sum + " and j is " + j + " and scaledLen is therefore: " + scaledLen);
                         var x = (canvas.width * 0.5) - (scaledLenX * Math.cos(rot));
                         var y = (canvas.height  * 0.5) - (scaledLenY * Math.sin(rot));
                         if ((j + 1) === samplesPerLine) {
                             ctx.moveTo(x, y);
-                            var hue = (len / 256) * 360;
+                            hue = (len / 255) * 360;
                             if ((runner > 25) && (((hue - oldHue) < 75) || (oldHue === -1))) {
                                 ctx.strokeStyle = "hsl(" + hue + ", 100%, 50%)";
                                 oldHue = hue;
                             }
                         } else {
+                            ctx.shadowColor = "hsl(" + hue + ", 100%, 50%)";;
+                            ctx.shadowOffsetX = 8;
+                            ctx.shadowOffsetY = 8;
+                            ctx.shadowBlur    = 12;
                             ctx.lineTo(x, y);
                         }
                         sum = 0;
@@ -125,8 +130,8 @@
                         rot += step;
                     }
                 }
-                ctx.moveTo(canvas.width * 0.5, canvas.height * 0.5);
-                ctx.stroke();                                
+                ctx.stroke();
+                ctx.restore();
                                 
             }, 50);  //setInterval
             
