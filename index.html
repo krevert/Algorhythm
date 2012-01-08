@@ -1,12 +1,12 @@
-<!DOCTYPE HTML> 
-<html> 
+<!DOCTYPE HTML>
+<html>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Nixie+One">
     <title>Sound Test</title>
-    <style type="text/css"> 
+    <style type="text/css">
         body {
-           background-color: #000; 
+           background-color: #000;
            font-family: "Nixie One", Helvetica, Arial, sans-serif;
            text-align: center;
         }
@@ -37,38 +37,38 @@
     <script type="text/javascript" src="js/loader.js"></script>
     <script type="text/javascript">
 
-  
+
     window.onload = function() {
-        
+
         var canvas;
         var ctx;
         var audioCtx;
-        
+
         var nodes;
         var intervalId;
-                
+
         function printErrorMessage(msg) {
             console.log(msg);
         }
-        
+
         function init() {
-            
+
             canvas = document.getElementById("paintdevice");
             ctx = canvas.getContext('2d');
             canvas.width  = window.innerWidth  * 0.95;
             canvas.height = window.innerHeight * 0.95;
 
             audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
-            
+
             if (!(ctx && audioCtx)) {
                 printErrorMessage("Missing canvas and/or audio api =(");
                 return;
             }
-            
+
             window.addEventListener('dragover', function(event) {
                 event.preventDefault();
             }, false);
-            
+
             window.addEventListener('drop', function(event) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -77,58 +77,58 @@
                 }
                 Loader.loadFile(event.dataTransfer.files, play, printErrorMessage);
             }, false);
-            
+
             //document.getElementById('openSoundFile').addEventListener('change', function(event) {
             //    if (!reset()) {
             //        return;
             //    }
             //    Loader.loadFile(event.target.files, play, printErrorMessage);
             //}, false);
-   
+
             ctx.strokeStyle = "hsl(720, 100%, 50%)";
             ctx.fillStyle = document.body.style.backgroundColor;
             ctx.lineWidth = 3;
             ctx.lineJoin = "round";
-            
+
             //Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
-    
+
         }
-        
+
         function reset() {
-            
+
             if (nodes) {
                 for (var i=0; i < nodes.length; i++) {
                     nodes[i].disconnect();
                 }
             }
-            
+
             // it seems that the following lines improve memory footprint,
             // but I have to investigate further here
             delete nodes;
-            delete audioCtx;   
+            delete audioCtx;
             nodes = new Array();
             audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
             if (!audioCtx) {
                 return false;
             }
-            
+
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
-            
+
             if (intervalId) {
                 window.clearInterval(intervalId);
                 intervalId = undefined;
             }
-            
+
             return true;
-            
+
         }
 
         function processAudioData(nodes) {
-        
+
             var analyzerNode = audioCtx.createAnalyser();
-            
+
             var hue;
             var oldHue = -1;
             var runner = 0;
@@ -137,7 +137,7 @@
             var border = 750;
 
             var data = new Uint8Array(fftSize);
-         
+
             var lines = 250;
             var samplesPerLine = Math.floor(border / lines);
             var step = (Math.PI * 8) / lines;
@@ -145,20 +145,20 @@
             analyzerNode.fftSize = fftSize;
             analyzerNode.smoothingTimeConstant = 0.75;
             nodes.push(analyzerNode);
-            
+
             intervalId = window.setInterval(function() {
 
                 ctx.beginPath();
-                
+
                 ctx.globalAlpha = 0.15;
                 ctx.rect(0, 0, canvas.width, canvas.height);
                 ctx.fill();
                 ctx.globalAlpha = 0.15;
-                
+
                 ctx.beginPath();
                 var sum  = 0, len = 0, rot = 0;
                 analyzerNode.getByteFrequencyData(data);
-                
+
                 ctx.save();
                 ctx.moveTo(canvas.width * 0.5, canvas.height * 0.5);
                 for (var j=0; j < border; j++) {
@@ -190,13 +190,13 @@
                 }
                 ctx.stroke();
                 ctx.restore();
-                                
+
             }, 50);  //setInterval
-            
+
         }
-        
+
         function play(rawBuffer) {
-            
+
             nodes = new Array;
             var mucke = audioCtx.createBuffer(rawBuffer, false);
             mucke.gain = 1.0;
@@ -206,16 +206,16 @@
             //console.log("channels: " + mucke.numberOfCannels);
 
             var source = audioCtx.createBufferSource();
-            source.buffer = mucke;  
+            source.buffer = mucke;
             nodes.push(source);
-                                               
+
             //var filter = audioCtx.createBiquadFilter();
             //filter.type = 0;
             //filter.frequency.value = 880;
             //nodes.push(filter);
-            
+
             processAudioData(nodes);
-            
+
             for (var i=0; i<nodes.length; i++) {
                 if (i === nodes.length - 1) {
                     nodes[i].connect(audioCtx.destination);
@@ -223,15 +223,15 @@
                     nodes[i].connect(nodes[i + 1]);
                 }
             }
-            
+
             nodes[0].noteOn(0);
-            
+
         }
 
         init();
-        
+
     }
-        
+
     </script>
 </head>
 

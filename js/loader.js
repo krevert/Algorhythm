@@ -4,11 +4,11 @@
  * loadFile: loads first file in fileList and calls
  * callback after success and onerror after an error
  * occured
- * 
+ *
  * requestFile: loads file given in parameter url
  * via XMLHttp request and calls callback after success
  * and onerror after an error occured
- * 
+ *
  * @author bekre
  */
 
