@@ -51,7 +51,7 @@
             canvas = document.getElementById("paintDevice");
             ctx = canvas.getContext('2d');
             canvas.width  = window.innerWidth * 0.9;
-            canvas.height = window.innerHeight * 0.75;
+            canvas.height = window.innerHeight * 0.9;
 
             audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
             
@@ -59,8 +59,26 @@
                 printErrorMessage("Missing canvas and/or audio api =(");
                 return;
             }
-           
-            document.getElementById('openSoundFile').addEventListener('change', openFile, false);
+            
+            window.addEventListener('dragover', function(event) {
+                event.preventDefault();
+            }, false);
+            
+            window.addEventListener('drop', function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                if (!reset()) {
+                    return;
+                }
+                Loader.loadFile(event.dataTransfer.files, play, printErrorMessage);
+            }, false);
+            
+            document.getElementById('openSoundFile').addEventListener('change', function(event) {
+                if (!reset()) {
+                    return;
+                }
+                Loader.loadFile(event.target.files, play, printErrorMessage);
+            }, false);
    
             ctx.strokeStyle = "hsl(720, 100%, 50%)";
             ctx.fillStyle = document.body.style.backgroundColor;
@@ -95,6 +113,7 @@
             
             if (intervalId) {
                 window.clearInterval(intervalId);
+                intervalId = undefined;
             }
             
             return true;
@@ -203,14 +222,7 @@
             nodes[0].noteOn(0);
             
         }
-                
-        function openFile(evt) {
-            if (!reset()) {
-                return;
-            }
-            Loader.loadFile(evt.target.files, play, printErrorMessage);
-        }
-        
+
         init();
         
     }
@@ -223,7 +235,7 @@
     =) <br />
 <input id="openSoundFile" type="file" />
 </div>
-<canvas id="paintDevice" width="800" height="600" >
+<canvas id="paintDevice">
     Your browser doesn't support the HTML5 Canvas element.
 </canvas>
 
