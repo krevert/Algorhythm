@@ -35,16 +35,18 @@
   
     window.onload = function() {
         
+        var canvas;
         var ctx;
         var audioCtx;
+        
+        var nodes;
+        var intervalId;
                 
-        function errorMessage(msg) {
+        function printErrorMessage(msg) {
             console.log(msg);
         }
         
         function init() {
-           
-            document.getElementById('openSoundFile').addEventListener('change', openFile, false);
             
             canvas = document.getElementById("paintDevice");
             ctx = canvas.getContext('2d');
@@ -54,15 +56,49 @@
             audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
             
             if (!(ctx && audioCtx)) {
-                errorMessage("Missing canvas and/or audio api =(");
+                printErrorMessage("Missing canvas and/or audio api =(");
                 return;
             }
+           
+            document.getElementById('openSoundFile').addEventListener('change', openFile, false);
    
             ctx.strokeStyle = "hsl(720, 100%, 50%)";
             ctx.fillStyle = document.body.style.backgroundColor;
             ctx.lineWidth = 3;
             ctx.lineJoin = "round";
+            
+            //Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
     
+        }
+        
+        function reset() {
+            
+            if (nodes) {
+                for (var i=0; i < nodes.length; i++) {
+                    nodes[i].disconnect();
+                }
+            }
+            
+            // it seems that the following lines improve memory footprint,
+            // but I have to investigate further here
+            delete nodes;
+            delete audioCtx;   
+            nodes = new Array();
+            audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
+            if (!audioCtx) {
+                return false;
+            }
+            
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            if (intervalId) {
+                window.clearInterval(intervalId);
+            }
+            
+            return true;
+            
         }
 
         function processAudioData(nodes) {
@@ -86,12 +122,11 @@
             analyzerNode.smoothingTimeConstant = 0.75;
             nodes.push(analyzerNode);
             
-            window.setInterval(function() {
+            intervalId = window.setInterval(function() {
 
                 ctx.beginPath();
                 
                 ctx.globalAlpha = 0.15;
-                //ctx.rect(8, 8, canvas.width - 16, canvas.height - 16); // 8/16 to avoid a border endering bug in webkit
                 ctx.rect(0, 0, canvas.width, canvas.height);
                 ctx.fill();
                 ctx.globalAlpha = 0.15;
@@ -108,7 +143,6 @@
                         len = sum / samplesPerLine;
                         var scaledLenX = (len / 255) * (canvas.width * 0.75);
                         var scaledLenY = (len / 255) * (canvas.height);
-                        //console.log("sum is: " + sum + " and j is " + j + " and scaledLen is therefore: " + scaledLen);
                         var x = (canvas.width * 0.5) - (scaledLenX * Math.cos(rot));
                         var y = (canvas.height  * 0.5) - (scaledLenY * Math.sin(rot));
                         if ((j + 1) === samplesPerLine) {
@@ -139,7 +173,7 @@
         
         function play(rawBuffer) {
             
-            var nodes = new Array;
+            nodes = new Array;
             var mucke = audioCtx.createBuffer(rawBuffer, false);
             mucke.gain = 1.0;
             //console.log("Sample Rate: " + mucke.sampleRate);
@@ -159,11 +193,11 @@
             processAudioData(nodes);
             
             for (var i=0; i<nodes.length; i++) {
-                    if (i === nodes.length - 1) {
-                            nodes[i].connect(audioCtx.destination);
-                    } else {
-                            nodes[i].connect(nodes[i + 1]);
-                    }
+                if (i === nodes.length - 1) {
+                    nodes[i].connect(audioCtx.destination);
+                } else {
+                    nodes[i].connect(nodes[i + 1]);
+                }
             }
             
             nodes[0].noteOn(0);
@@ -171,7 +205,10 @@
         }
                 
         function openFile(evt) {
-            Loader.loadFile(evt.target.files, play, errorMessage);
+            if (!reset()) {
+                return;
+            }
+            Loader.loadFile(evt.target.files, play, printErrorMessage);
         }
         
         init();

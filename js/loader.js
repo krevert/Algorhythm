@@ -32,6 +32,24 @@ var Loader = (function() {
         }
     }
     
+    loader.requestFile = function(url, callback, onerror) {
+        
+        var request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.responseType = "arraybuffer"
+        request.onload = function() {
+            if (callback)
+                callback(request.response);
+        }   
+        request.onerror = function() {
+            if (onerror)
+                onerror("Error while requesting audio file");
+        }
+
+        request.send();
+        
+    }
+    
     return loader;
     
 }());
