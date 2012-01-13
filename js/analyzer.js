@@ -1,12 +1,16 @@
 var Analyzer = (function() {
-    
-    var audioCtx, ctx;    
+
+    var audioCtx, ctx;
     var width, height;
 
     var nodes;
     var intervalId;
 
-    var init = function() {
+    var settings;
+
+    var init = function(s) {
+
+        settings = s;
 
         var canvas = document.getElementById("paintdevice");
         ctx = canvas.getContext('2d');
@@ -50,7 +54,7 @@ var Analyzer = (function() {
         //Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
 
     }
-    
+
     var printErrorMessage = function(msg) {
         console.log(msg);
     }
@@ -94,20 +98,22 @@ var Analyzer = (function() {
         var oldHue = -1;
         var runner = 0;
 
-        var fftSize = 750;
-        var border = 750;
+        var fftSize = 2048;
+        var border = fftSize * 0.25;
 
         var data = new Uint8Array(fftSize);
-
-        var lines = 250;
-        var samplesPerLine = Math.floor(border / lines);
-        var step = (Math.PI * 8) / lines;
 
         analyzerNode.fftSize = fftSize;
         analyzerNode.smoothingTimeConstant = 0.75;
         nodes.push(analyzerNode);
 
         intervalId = window.setInterval(function() {
+
+            var sum  = 0, len = 0, rot = 0;
+
+            var lines = settings.lines;
+            var samplesPerLine = Math.floor(border / lines);
+            var step = (Math.PI * 2 * settings.circles) / lines;
 
             ctx.beginPath();
 
@@ -117,7 +123,6 @@ var Analyzer = (function() {
             ctx.globalAlpha = 0.15;
 
             ctx.beginPath();
-            var sum  = 0, len = 0, rot = 0;
             analyzerNode.getByteFrequencyData(data);
 
             ctx.save();
@@ -139,8 +144,8 @@ var Analyzer = (function() {
                         }
                     } else {
                         ctx.shadowColor = "hsl(" + hue + ", 100%, 50%)";;
-                        ctx.shadowOffsetX = 8;
-                        ctx.shadowOffsetY = 8;
+                        ctx.shadowOffsetX = 4;
+                        ctx.shadowOffsetY = 4;
                         ctx.shadowBlur    = 12;
                         ctx.lineTo(x, y);
                     }
@@ -187,6 +192,6 @@ var Analyzer = (function() {
         nodes[0].noteOn(0);
 
     }
-    
+
     return init;
-})(); 
+})();
