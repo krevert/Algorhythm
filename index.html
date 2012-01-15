@@ -7,32 +7,64 @@
     <style type="text/css">
         body {
            background-color: #000;
+           color: #eee;
            font-family: "Cabin", Helvetica, Arial, sans-serif;
+           font-style: normal;
            text-align: center;
         }
-        #info {
-           width: 250px;
-           height: 25px;
-           background-color: #2f2f2f;
-           border: 1px solid;
-           border-radius: 20px;
-           border-color: #e3e3e3;
-           margin-top: 4px;
-           margin-left: auto;
-           margin-right: auto;
-           opacity: 0.8;
+        ul {
+           display: block;
+           list-style-type: disc;
+           width: 100%;
+           height: 100%;
+           margin: 0px;
+           padding: 0px;
+           position: relative;
         }
-        #infotext {
-            margin-top: 2px;
-            color: #e3e3e3;
+        li {
+            list-style: none;
+            float: right;
+            display: list-item;
+            border-left: 2px solid;
+            height: 20px;
+            padding: 0px;
+            margin: 2px;
+            width: 245px;
+            opacity: 1;
         }
-        #paintdevice {
-            width: 100%;
-            height: 100%;
-            margin: 4px;
-            position: fixed;
+        ul li a {
+            color: #aaa;
+            text-decoration: none;
         }
-
+        ul li a:visited {
+            color: #aaa;
+            text-decoration:none;
+        }
+        ul li a:hover {
+            color: #fff;
+            text-decoration:none;
+        }
+        .menu {
+           position: fixed;
+           left: 0px;
+           right: 0px;
+           bottom: auto;
+           top: 0;
+           margin: 0px;
+           height: 20px;
+        }
+        #aboutBox {
+            height: 250px;
+            width:  235px;
+            color:  #fff;
+            margin-top: 4px;
+            background-color: #222;
+            border: 2px solid;
+            border-color: #aaa;
+            border-radius: 8px;
+            opacity: 0.6;
+            display: none;
+        }
     </style>
 
     <script type="text/javascript" src="3rdparty/dat.gui.min.js"></script>
@@ -49,23 +81,66 @@
         };
 
         // gui stuff
-        var gui = new dat.GUI();
-        gui.close();
-        gui.add(settings, 'lines').name('Lines').min(50).max(500).step(1);
-        gui.add(settings, 'circles').name('Circles').min(1).max(15).step(1);
+        (function() {
+            var optionMenuVisible = false;
+            var aboutMenuVisible  = false;
 
-        Analyzer(settings);
+            var gui = new dat.GUI({ autoPlace: true, width: 250 });
+            var optionField = document.getElementById('options');
+            optionField.appendChild(gui.domElement);
+
+            var closeButton = document.getElementsByClassName('close-button')[0];
+            if (closeButton) {
+                closeButton.style.display = 'none';
+            }
+
+            document.getElementById('optionMenu').addEventListener('click', function() {
+                if (optionMenuVisible)
+                    gui.close();
+                else
+                    gui.open();
+                optionMenuVisible = !optionMenuVisible;
+            }, false);
+
+            var aboutBox = document.getElementById('aboutBox');
+            document.getElementById('aboutMenu').addEventListener('click', function() {
+                if (aboutMenuVisible)
+                    aboutBox.style.display = 'none';
+                else
+                    aboutBox.style.display = 'block';
+                aboutMenuVisible = !aboutMenuVisible;
+            }, false);
+
+            gui.close();
+            gui.add(settings, 'lines').name('Lines').min(50).max(500).step(1);
+            gui.add(settings, 'circles').name('Circles').min(1).max(15).step(1);
+
+            Analyzer(settings);
+        })();
     }
 
     </script>
 </head>
 
 <body>
-<div id="container">
-<div id="info">
-    <p id="infotext"> algorhythm::circles by bekre =) </p>
+
+<div class="menu">
+<ul>
+    <li>
+        <a id="aboutMenu" href="#"> About</a>
+        <div id="aboutBox">
+            <br><br>
+            Foo <br>
+            Bar <br>
+            =O <br>
+        <div>
+    </li>
+    <li><a id="optionMenu" href="#">Options</a>
+    <div id="options"></div>
+    </li>
+</ul>
 </div>
-</div>
+
 <canvas id="paintdevice">
     Your browser doesn't support the HTML5 Canvas element.
 </canvas>
