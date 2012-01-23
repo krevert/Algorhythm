@@ -29,7 +29,7 @@
             height: 20px;
             padding: 0px;
             margin: 2px;
-            width: 245px;
+            width: 300px;
             opacity: 1;
         }
         ul li a {
@@ -53,17 +53,59 @@
            margin: 0px;
            height: 20px;
         }
+        .button {
+           position: relative;
+           width: 240px;
+           height: 50px;
+           left: 50%;
+           font-size: 22pt;
+           line-height: 50px;
+           margin-left: -120px;
+           background-color: #00227f;
+           border: 2px solid;
+           border-radius: 16px;
+           border-color: #aaa;
+           -moz-box-shadow:    5px 5px 10px 1px #446;
+           -webkit-box-shadow: 5px 5px 10px 1px #446;
+           box-shadow:         5px 5px 10px 1px #446;
+           opacity: 0.6;
+        }
+        .button:active {
+           background-color: #0022af;
+        }
         #aboutBox {
             height: 250px;
-            width:  235px;
+            width:  290px;
             color:  #fff;
-            margin-top: 4px;
+            margin-top: 8px;
             background-color: #222;
             border: 2px solid;
             border-color: #aaa;
             border-radius: 8px;
             opacity: 0.6;
             display: none;
+            overflow: hidden;
+           /* -webkit-transition: height 0.25s ease-out;*/
+        }
+        #greetBox {
+            display: block;
+            font-size: 18pt;
+            position: fixed;
+            width: 30%;
+            height: 30%;
+            min-height: 300px;
+            top: 35%;
+            left: 35%;
+            padding: 35px;
+            border: 2px solid;
+            border-color: #aaa;
+            border-radius: 16px;
+            opacity: 0.6;
+            -webkit-transition: opacity 0.5s ease-in;
+        }
+        #loadingText {
+            display: none;
+            font-size: 22pt;
         }
     </style>
 
@@ -85,7 +127,12 @@
             var optionMenuVisible = false;
             var aboutMenuVisible  = false;
 
-            var gui = new dat.GUI({ autoPlace: true, width: 250 });
+            document.getElementById('playButton').addEventListener('click', function() {
+                document.getElementById('loadingText').style.display = 'block';
+                Analyzer(settings);
+            }, false);
+
+            var gui = new dat.GUI({ autoPlace: false, width: 250 });
             var optionField = document.getElementById('options');
             optionField.appendChild(gui.domElement);
 
@@ -104,18 +151,20 @@
 
             var aboutBox = document.getElementById('aboutBox');
             document.getElementById('aboutMenu').addEventListener('click', function() {
-                if (aboutMenuVisible)
-                    aboutBox.style.display = 'none';
-                else
-                    aboutBox.style.display = 'block';
+                if (aboutMenuVisible) {
+                    aboutBox.style.display  = 'none';
+                    //aboutBox.style.height  = '0px';
+                }
+                else {
+                    aboutBox.style.display  = 'block';
+                    //aboutBox.style.height  = '250px';
+                }
                 aboutMenuVisible = !aboutMenuVisible;
             }, false);
 
             gui.close();
             gui.add(settings, 'lines').name('Lines').min(50).max(500).step(1);
             gui.add(settings, 'circles').name('Circles').min(1).max(15).step(1);
-
-            Analyzer(settings);
         })();
     }
 
@@ -139,6 +188,14 @@
     <div id="options"></div>
     </li>
 </ul>
+</div>
+
+
+<div id="greetBox">
+    <p> Tiny audio visualizer in glorious HTML5 </p>
+    <p> You can also play your own music: Just drag an audio file to the canvas and enjoy! </p>
+    <div id="playButton" class="button">Play</div>
+    <br><div id="loadingText">Loading ...</div>
 </div>
 
 <canvas id="paintdevice">

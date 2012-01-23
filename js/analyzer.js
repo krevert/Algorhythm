@@ -51,7 +51,7 @@ var Analyzer = (function() {
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
 
-        //Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
+        Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
 
     }
 
@@ -162,6 +162,8 @@ var Analyzer = (function() {
     }
 
     var play = function(rawBuffer) {
+
+        document.getElementById('greetBox').style.opacity = 0.0;
 
         var mucke = audioCtx.createBuffer(rawBuffer, false);
         mucke.gain = 1.0;
