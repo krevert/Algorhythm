@@ -7,9 +7,16 @@ var Analyzer = (function() {
     var intervalId;
 
     var settings;
+    
+    var initialized = false;
 
     var init = function(s) {
 
+        if (initialized)
+            return;
+        
+        initialized = true;
+        
         settings = s;
 
         var canvas = document.getElementById("paintdevice");
@@ -56,7 +63,16 @@ var Analyzer = (function() {
     }
 
     var printErrorMessage = function(msg) {
-        console.log(msg);
+        console.log("Error!");
+        var errorElement = document.getElementById('errorMessage');
+        errorElement.innerHTML = msg;
+        var errorStyle = errorElement.style;
+        errorStyle.transform = errorStyle.webkitTransform = errorStyle.mozTransform = 'scale(1.0)';
+        errorStyle.opacity = 0.6;
+        window.setTimeout(function() {
+            errorStyle.transform = errorStyle.webkitTransform = errorStyle.mozTransform = 'scale(0.0)';
+            errorStyle.opacity = 0.1;
+        }, 3500);
     }
 
     var reset = function() {

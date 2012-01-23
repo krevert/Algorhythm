@@ -102,10 +102,33 @@
             border-radius: 16px;
             opacity: 0.6;
             -webkit-transition: opacity 0.5s ease-in;
+            -moz-transition: opacity 0.5s ease-in;
+            transition: opacity 0.5s ease-in;
         }
         #loadingText {
             display: none;
             font-size: 22pt;
+        }
+        #errorMessage {
+            display: block;
+            position: fixed;
+            bottom: 5%;
+            left: 15%;
+            right: 15%;
+            height: 50px;
+            line-height: 50px;
+            font-size: 22pt;
+            color: #950000;
+            border: 2px solid;
+            border-color: #aaa;
+            border-radius: 16px;
+            opacity: 0.1;
+            -webkit-transform: scale(0.0);
+            -moz-transform: scale(0.0);
+            transform: scale(0.0);
+            -webkit-transition: -webkit-transform 0.3s, opacity 0.5s;
+            -moz-transition: -moz-transform 1.0s, opacity 1.0s;
+            transition: transform 1.0s, opacity 1.0s;
         }
     </style>
 
@@ -126,6 +149,7 @@
         (function() {
             var optionMenuVisible = false;
             var aboutMenuVisible  = false;
+            var running = false;
 
             document.getElementById('playButton').addEventListener('click', function() {
                 document.getElementById('loadingText').style.display = 'block';
@@ -190,13 +214,14 @@
 </ul>
 </div>
 
-
 <div id="greetBox">
     <p> Tiny audio visualizer in glorious HTML5 </p>
     <p> You can also play your own music: Just drag an audio file to the canvas and enjoy! </p>
     <div id="playButton" class="button">Play</div>
     <br><div id="loadingText">Loading ...</div>
 </div>
+
+<div id="errorMessage"></div>
 
 <canvas id="paintdevice">
     Your browser doesn't support the HTML5 Canvas element.
