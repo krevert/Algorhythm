@@ -101,6 +101,7 @@
             border-color: #aaa;
             border-radius: 16px;
             opacity: 0.6;
+            overflow: hidden;
             -webkit-transition: opacity 0.5s ease-in;
             -moz-transition: opacity 0.5s ease-in;
             transition: opacity 0.5s ease-in;
@@ -142,7 +143,9 @@
 
         var settings = {
             lines: 250,
-            circles: 4
+            circles: 4,
+            exposure: 0.15,
+            brightness: 0.15
         };
 
         // gui stuff
@@ -189,6 +192,8 @@
             gui.close();
             gui.add(settings, 'lines').name('Lines').min(50).max(500).step(1);
             gui.add(settings, 'circles').name('Circles').min(1).max(15).step(1);
+            gui.add(settings, 'exposure').name('Exposure').min(0.05).max(0.25);
+            gui.add(settings, 'brightness').name('Brightness').min(0.05).max(0.4);
         })();
     }
 

@@ -57,6 +57,15 @@ var Analyzer = (function() {
         ctx.fillStyle = document.body.style.backgroundColor;
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
+     
+        window.onresize = function() {
+            width = canvas.width  = window.innerWidth  * 0.95;
+            height = canvas.height = window.innerHeight * 0.95;
+            if (ctx) {
+                ctx.clearRect(0, 0, width, height);
+            }
+            ctx.lineWidth = 3;
+        }
 
         Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
 
@@ -115,7 +124,8 @@ var Analyzer = (function() {
         var runner = 0;
 
         var fftSize = 2048;
-        var border = fftSize * 0.25;
+        //we don't draw all fft samples, just some interesting ones
+        var usedFftSize = fftSize * 0.25;
 
         var data = new Uint8Array(fftSize);
 
@@ -128,22 +138,22 @@ var Analyzer = (function() {
             var sum  = 0, len = 0, rot = 0;
 
             var lines = settings.lines;
-            var samplesPerLine = Math.floor(border / lines);
+            var samplesPerLine = Math.floor(usedFftSize / lines);
             var step = (Math.PI * 2 * settings.circles) / lines;
 
             ctx.beginPath();
 
-            ctx.globalAlpha = 0.15;
+            ctx.globalAlpha = settings.exposure;
             ctx.rect(0, 0, width, height);
             ctx.fill();
-            ctx.globalAlpha = 0.15;
+            ctx.globalAlpha = settings.brightness;
 
             ctx.beginPath();
             analyzerNode.getByteFrequencyData(data);
 
             ctx.save();
             ctx.moveTo(width * 0.5, height * 0.5);
-            for (var j=0; j < border; j++) {
+            for (var j=0; j < usedFftSize; j++) {
                 sum += data[j];
                 if ((j + 1) % samplesPerLine === 0) {
                     len = sum / samplesPerLine;
@@ -197,7 +207,7 @@ var Analyzer = (function() {
         //filter.frequency.value = 880;
         //nodes.push(filter);
 
-        processAudioData(nodes);
+        processAudioData();
 
         for (var i=0; i<nodes.length; i++) {
             if (i === nodes.length - 1) {
