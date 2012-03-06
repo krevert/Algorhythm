@@ -9,6 +9,8 @@ var Analyzer = (function() {
     var settings;
     
     var initialized = false;
+    
+    var dirtyFlag = true;
 
     var init = function(s) {
 
@@ -65,6 +67,7 @@ var Analyzer = (function() {
                 ctx.clearRect(0, 0, width, height);
             }
             ctx.lineWidth = 3;
+            dirtyFlag = true;
         }
 
         Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
@@ -121,7 +124,6 @@ var Analyzer = (function() {
 
         var hue;
         var oldHue = -1;
-        var runner = 0;
 
         var fftSize = 2048;
         //we don't draw all fft samples, just some interesting ones
@@ -164,19 +166,19 @@ var Analyzer = (function() {
                     if ((j + 1) === samplesPerLine) {
                         ctx.moveTo(x, y);
                         hue = (len / 255) * 360;
-                        if ((runner > 25) && (((hue - oldHue) < 75) || (oldHue === -1))) {
+                        if (dirtyFlag || (((hue - oldHue) < 75))) {
                             ctx.strokeStyle = "hsl(" + hue + ", 100%, 50%)";
-                            oldHue = hue;
+                            ctx.shadowColor = "hsl(" + hue + ", 100%, 50%)";;
+                            ctx.shadowOffsetX = 4;
+                            ctx.shadowOffsetY = 4;
+                            ctx.shadowBlur    = 12;
+                            dirtyFlag = false;
                         }
+                    oldHue = hue;
                     } else {
-                        ctx.shadowColor = "hsl(" + hue + ", 100%, 50%)";;
-                        ctx.shadowOffsetX = 4;
-                        ctx.shadowOffsetY = 4;
-                        ctx.shadowBlur    = 12;
                         ctx.lineTo(x, y);
                     }
                     sum = 0;
-                    runner++;
                     rot += step;
                 }
             }
