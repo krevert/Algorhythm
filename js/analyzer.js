@@ -69,9 +69,13 @@ var Analyzer = (function() {
             ctx.lineWidth = 3;
             dirtyFlag = true;
         }
+        
+        return loadDefaultFile;
 
+    }
+    
+    var loadDefaultFile = function() {
         Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
-
     }
 
     var printErrorMessage = function(msg) {

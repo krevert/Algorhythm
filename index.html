@@ -156,10 +156,12 @@
             var optionMenuVisible = false;
             var aboutMenuVisible  = false;
             var running = false;
+            
+            var letsgo = Analyzer(settings);
 
             document.getElementById('playButton').addEventListener('click', function() {
                 document.getElementById('loadingText').style.display = 'block';
-                Analyzer(settings);
+                letsgo();
             }, false);
 
             var gui = new dat.GUI({ autoPlace: false, width: 250 });
