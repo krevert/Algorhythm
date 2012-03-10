@@ -26,7 +26,7 @@ var Analyzer = (function() {
         width = canvas.width  = window.innerWidth  * 0.95;
         height = canvas.height = window.innerHeight * 0.95;
 
-        audioCtx = webkitAudioContext ? new webkitAudioContext() : null;
+        audioCtx = typeof webkitAudioContext != 'undefined' ? new webkitAudioContext() : null;
 
         if (!(ctx && audioCtx)) {
             printErrorMessage("Missing canvas and/or audio api =(");
@@ -79,10 +79,10 @@ var Analyzer = (function() {
         var errorElement = document.getElementById('errorMessage');
         errorElement.innerHTML = msg;
         var errorStyle = errorElement.style;
-        errorStyle.transform = errorStyle.webkitTransform = errorStyle.mozTransform = 'scale(1.0)';
+        errorStyle.transform = errorStyle.webkitTransform = errorStyle.MozTransform = 'scale(1.0)';
         errorStyle.opacity = 0.6;
         window.setTimeout(function() {
-            errorStyle.transform = errorStyle.webkitTransform = errorStyle.mozTransform = 'scale(0.0)';
+            errorStyle.transform = errorStyle.webkitTransform = errorStyle.MozTransform = 'scale(0.0)';
             errorStyle.opacity = 0.1;
         }, 3500);
     }
