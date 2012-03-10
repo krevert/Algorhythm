@@ -166,12 +166,12 @@ var Analyzer = (function() {
                     if ((j + 1) === samplesPerLine) {
                         ctx.moveTo(x, y);
                         hue = (len / 255) * 360;
-                        if (dirtyFlag || (((hue - oldHue) < 75))) {
+                        if (dirtyFlag || (((hue - oldHue) < settings.coloring))) {
                             ctx.strokeStyle = "hsl(" + hue + ", 100%, 50%)";
                             ctx.shadowColor = "hsl(" + hue + ", 100%, 50%)";;
-                            ctx.shadowOffsetX = 4;
-                            ctx.shadowOffsetY = 4;
-                            ctx.shadowBlur    = 12;
+                            ctx.shadowOffsetX = settings.shadowOffset;
+                            ctx.shadowOffsetY = settings.shadowOffset;
+                            ctx.shadowBlur    = settings.shadowBlur;
                             dirtyFlag = false;
                         }
                     oldHue = hue;

@@ -144,8 +144,11 @@
         var settings = {
             lines: 250,
             circles: 4,
-            exposure: 0.15,
-            brightness: 0.15
+            exposure: 0.09,
+            brightness: 0.27,
+            shadowBlur: 24,
+            shadowOffset: 4,
+            coloring: 75
         };
 
         // gui stuff
@@ -194,6 +197,9 @@
             gui.add(settings, 'circles').name('Circles').min(1).max(15).step(1);
             gui.add(settings, 'exposure').name('Exposure').min(0.05).max(0.25);
             gui.add(settings, 'brightness').name('Brightness').min(0.05).max(0.4);
+            //gui.add(settings, 'shadowBlur').name('Shadow Blur').min(2).max(48);
+            //gui.add(settings, 'shadowOffset').name('Shadow Offset').min(2).max(12);
+            //gui.add(settings, 'coloring').name('Coloring').min(5).max(100);
         })();
     }
 
