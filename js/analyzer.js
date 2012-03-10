@@ -29,8 +29,7 @@ var Analyzer = (function() {
         audioCtx = typeof webkitAudioContext != 'undefined' ? new webkitAudioContext() : null;
 
         if (!(ctx && audioCtx)) {
-            printErrorMessage("Missing canvas and/or audio api =(");
-            return;
+            return browserError;
         }
 
         window.addEventListener('dragover', function(event) {
@@ -76,6 +75,10 @@ var Analyzer = (function() {
     
     var loadDefaultFile = function() {
         Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
+    }
+    
+    var browserError = function() {
+         printErrorMessage("Missing canvas and/or audio api =(");
     }
 
     var printErrorMessage = function(msg) {
