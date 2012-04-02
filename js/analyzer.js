@@ -7,18 +7,18 @@ var Analyzer = (function() {
     var intervalId;
 
     var settings;
-    
+
     var initialized = false;
-    
+
     var dirtyFlag = true;
 
     var init = function(s) {
 
         if (initialized)
             return;
-        
+
         initialized = true;
-        
+
         settings = s;
 
         var canvas = document.getElementById("paintdevice");
@@ -58,7 +58,7 @@ var Analyzer = (function() {
         ctx.fillStyle = document.body.style.backgroundColor;
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
-     
+
         window.onresize = function() {
             width = canvas.width  = window.innerWidth  * 0.95;
             height = canvas.height = window.innerHeight * 0.95;
@@ -68,15 +68,15 @@ var Analyzer = (function() {
             ctx.lineWidth = 3;
             dirtyFlag = true;
         }
-        
+
         return loadDefaultFile;
 
     }
-    
+
     var loadDefaultFile = function() {
         Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
     }
-    
+
     var browserError = function() {
          printErrorMessage("Missing canvas and/or audio api =(");
     }
