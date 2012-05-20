@@ -74,7 +74,7 @@ var Analyzer = (function() {
     }
 
     var loadDefaultFile = function() {
-        Loader.requestFile("content/CloudCompany.mp3", play, printErrorMessage);
+        Loader.requestFile("../content/CloudCompany.mp3", play, printErrorMessage);
     }
 
     var browserError = function() {
