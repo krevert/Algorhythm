@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Nixie+One">
+    <title>Sound Test</title>
+    <style type="text/css">
+        body {
+            background-color: #dadce9;
+            text-align:center;
+            margin: 0px;
+            overflow: hidden;
+        }
+        #info {
+            font-family: "Nixie One", Helvetica, Arial, sans-serif;
+            text-shadow: 0.15em 0.15em 0.2em #333;
+            font-size: 28px;
+            line-height: 1.6em;
+            margin-top: 30px;
+            margin-bottom: 0px;
+        }
+        #renderArea {
+            position: relative;
+            border: 3px solid;
+            padding: 4px;
+            border-radius: 20px;
+            margin: 25px;
+        }
+
+    </style>
+
+    <!-- Shaders -->
+    <script type="x-shader/x-vertex" id="vertexshader">
+        varying vec3 vNormal;
+        attribute float displacement;
+        varying float vDis;
+        void main()
+        {
+            vNormal = normalize(normalMatrix * normal);
+            vDis    = displacement;
+            vec3 distortedPos = position + normal * vec3(displacement);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(distortedPos, 1.0);
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="fragmentshader">
+        varying vec3 vNormal;
+        varying float vDis;
+        void main()
+        {
+
+            float h = (1.0 - (vDis / 6.0)) * 0.5;
+
+            vec3 lightSource  = normalize(vec3(0.0, 0.0, 20.0));
+            vec3 color        = vec3(1.0, 0.4, 0.4);
+            vec3 depth        = vec3(h, h, 1.0 - h);
+
+            float diffuse = max(0.0, 1.0 - dot(lightSource, vNormal)) * 0.8 + 0.2;
+            diffuse = diffuse * diffuse * diffuse;
+            vec3 shading = clamp(color * diffuse  + color * depth, 0.0, 1.0);
+            gl_FragColor    = vec4(shading, 1.0);
+            //gl_FragColor    = vec4(h, h, h, 1.0);
+
+        }
+    </script>
+
+    <script type="text/javascript" src="../js/loader.js"></script>
+    <script type="text/javascript" src="../3rdparty/ThreeAttributes.js"></script>
+    <script type="text/javascript" src="../js/maggot.js"></script>
+    <script type="text/javascript">
+
+    window.onload = function() {
+
+        Analyzer();
+
+    }
+
+    </script>
+</head>
+
+<body>
+<div id="info">
+    =)
+</div>
+<div id="renderArea"></div>
+</body>
+</html>
+
