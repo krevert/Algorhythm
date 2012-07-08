@@ -10,19 +10,30 @@ var Analyzer = (function() {
     var scene;
     var camera;
     
+    var sphere;
+    var vCount;
+    
+    var attributes = {
+        displacement: {
+            type: 'f', // a float
+            value: [] // an empty array
+        }
+    }
+        
     var setSize = function(area) {
-        var size = Math.min(window.innerWidth  * 0.8, window.innerHeight * 0.8);
-        renderer.setSize(size, size);
-        area.style.width  = size + "px";
-        area.style.height = size + "px";
-        area.style.left   = ((window.innerWidth - size) / 2.0) + "px";
+        var size = {x: window.innerWidth * 0.9 - 360, y: window.innerHeight * 0.95};
+        renderer.setSize(size.x, size.y);
+        camera.aspect = size.x / size.y;
+        camera.updateProjectionMatrix();
+        area.style.width  = size.x + "px";
+        area.style.height = size.y + "px";
     }
     
     var init = function() {
         
-        var audioCtx = typeof webkitAudioContext != "undefined" ? new webkitAudioContext() : null;
-        var mucke = null;
-        var nodes = new Array;
+        audioCtx = typeof webkitAudioContext != "undefined" ? new webkitAudioContext() : null;
+        mucke = null;
+        nodes = new Array;
 
         window.addEventListener('dragover', function(event) {
             event.preventDefault();
@@ -37,7 +48,6 @@ var Analyzer = (function() {
         var area = document.getElementById("renderArea");
         renderer = new THREE.WebGLRenderer();
         renderer.setClearColorHex(0xdadce9, 1);
-        setSize(area);
         area.appendChild(renderer.domElement);
                 
         // create a scene
@@ -47,44 +57,38 @@ var Analyzer = (function() {
         camera.position.z = 25;
         scene.addChild(camera);
         
-       // create mesh
+        setSize(area);
         
-        var attributes = {
-            displacement: {
-                type: 'f', // a float
-                value: [] // an empty array
-            }
-        };
+        // create mesh    
+        var sphereGeometry = new THREE.SphereGeometry(5, 32, 32);
+        vCount = sphereGeometry.vertices.length;
+        var myVertexShader = document.getElementById("vertexshader").innerHTML;
+        var myFragmentShader = document.getElementById("fragmentshader").innerHTML;
+        var material = new THREE.MeshShaderMaterial(
+           { attributes     : attributes,
+             vertexShader   : myVertexShader,
+             fragmentShader : myFragmentShader
+           }
+         );
+       
+        for (var i = 0; i < vCount; i++) {
+             attributes.displacement.value[i] = Math.random();
+        }
+       
+        window.onresize = function() {
+           var area = document.getElementById("renderArea");
+           setSize(area);
+           renderer.render(scene, camera);
+        }
+       
+        sphere = new THREE.Mesh(sphereGeometry, material);
+        //sphere.scale.set(1.0, 1.0, 1.0);
+        //sphere.position.set(0.0, 0.0, -25.0);
+        sphere.overdraw = true;
+        sphere.dynamic = true;
+        scene.addChild(sphere);
         
-       var sphereGeometry = new THREE.SphereGeometry(5, 32, 32);
-       var vCount = sphereGeometry.vertices.length;
-       var myVertexShader = document.getElementById("vertexshader").innerHTML;
-       var myFragmentShader = document.getElementById("fragmentshader").innerHTML;
-       var material = new THREE.MeshShaderMaterial(
-          { attributes     : attributes,
-            vertexShader   : myVertexShader,
-            fragmentShader : myFragmentShader
-          }
-        );
-       
-       for (var i = 0; i < vCount; i++) {
-            attributes.displacement.value[i] = Math.random();
-       }
-       
-       window.onresize = function() {
-          var area = document.getElementById("renderArea");
-          setSize(area);
-          renderer.render(scene, camera);
-       }
-       
-       var sphere = new THREE.Mesh(sphereGeometry, material);
-       //sphere.scale.set(1.0, 1.0, 1.0);
-       //sphere.position.set(0.0, 0.0, -25.0);
-       sphere.overdraw = true;
-       sphere.dynamic = true;
-       scene.addChild(sphere);
-        
-       renderer.render(scene, camera);
+        renderer.render(scene, camera);
         
     }
 
@@ -94,7 +98,7 @@ var Analyzer = (function() {
         analyzerNode.fftSize = 2048;
         analyzerNode.smoothingTimeConstant = 0.75;
         nodes.push(analyzerNode); 
-        
+
         //bins: the sphere's vertices
         var runTo = 512;
         var binSize = Math.ceil(runTo / vCount);
