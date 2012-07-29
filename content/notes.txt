@@ -1,4 +1,14 @@
+CloudCompany.mp3:
 Music: "In the Company of Clouds" by mattipaalanen
 The song is released under a Creative Commons license
 
-http://soundcloud.com/mattipaalanen/cloudcompany
+http://soundclouid.com/mattipaalanen/cloudcompany
+
+Hora_Staccato.mp3:
+Music: Grigoras Dinicu, Hora Staccato, Arranged by Jasha Heifetz and William
+Primrose for Viola and Piano.  Played by Elias Goldstein, Viola and
+Matthew Ganong, Piano.
+
+Released under EFF Open Audio License
+
+http://www.ibiblio.org/pandora/mp3/contrib/Elias_Goldstein_Live/viola/8Hora_Staccato.mp3
