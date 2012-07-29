@@ -6,7 +6,7 @@
     <title>algorhythm::maggot</title>
     <style type="text/css">
         body {
-            background-color: #dadce9;
+            background-color: #10101e;
             text-align:center;
             margin: 0px;
             overflow: hidden;
@@ -18,19 +18,24 @@
             bottom: 0px;
             width: 360px;
             font-family: "Crimson Text", Helvetica, Arial, sans-serif;
-            text-shadow: 0.15em 0.15em 0.2em #999;
+            color: #fff;
             font-size: 24px;
             margin: 20px
         }
         #renderArea {
             position: absolute;
+            background-color: #dadce9;
             right: 20px;
             top: 0px;
             bottom: 0px;
-            border: 3px solid;
             padding: 4px;
             border-radius: 20px;
-            margin: 20px
+            margin: 20px;
+            background-image: -moz-radial-gradient(circle, #fff, #C9CBDA);
+            background-image: -webkit-radial-gradient(circle, #fff, #C9CBDA);
+            background-image: -o-radial-gradient(circle, #fff, #C9CBDA);
+            background-image: -ms-radial-gradient(circle, #fff, #C9CBDA);
+            background-image: radial-gradient(circle, #fff, #C9CBDA);
         }
 
     </style>
@@ -85,7 +90,7 @@
 <div id="info">
 <br>
 <p>Audio visualizer written in WebGL and Webkit's audio api.</p> <br>
-<p>You can either drag a audio file to the canvas or play some sample music.</p>
+<p>You can either drag an audio file to the canvas or play some sample music.</p>
 <p>Needs a browser that supports WebGL and Webkit's audio api to work properly.</p>
 <p>I'll work on a Firefox version when I find the time.</p><br>
 <p>=)</p>
