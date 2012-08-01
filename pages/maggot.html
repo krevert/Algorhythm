@@ -11,6 +11,11 @@
             margin: 0px;
             overflow: hidden;
         }
+        a {
+            text-decoration: underline;
+            color: #bbb;
+            cursor: pointer;
+        }
         #info {
             position: absolute;
             left: 20px;
@@ -36,6 +41,23 @@
             background-image: -o-radial-gradient(circle, #fff, #C9CBDA);
             background-image: -ms-radial-gradient(circle, #fff, #C9CBDA);
             background-image: radial-gradient(circle, #fff, #C9CBDA);
+        }
+        #loadingMessage {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -150px;
+            margin-top: -50px;
+            width: 300px;
+            height: 100px;
+            color: #fff;
+            background: #10101e;
+            border-radius: 20px;
+            border: 4px;
+            opacity: 0.7;
+            font-size: 22pt;
+            line-height: 100px;
         }
 
     </style>
@@ -80,22 +102,35 @@
     <script type="text/javascript">
 
     window.onload = function() {
-        Analyzer();
+        
+        var msg = document.getElementById("loadingMessage");
+        msg.style.display = "none";
+        Analyzer.init();
+        
+        document.getElementById("sampleMusicLink").addEventListener("click", function() {
+            if (msg.style.display != "none")
+                return;
+            msg.style.display = "block";
+            Analyzer.loadFile("../content/Hora_Staccato.mp3");
+        });
+        
     }
 
     </script>
 </head>
 
 <body>
-<div id="info">
-<br>
-<p>Audio visualizer written in WebGL and Webkit's audio api.</p> <br>
-<p>You can either drag an audio file to the canvas or play some sample music.</p>
-<p>Needs a browser that supports WebGL and Webkit's audio api to work properly.</p>
-<p>I'll work on a Firefox version when I find the time.</p><br>
-<p>=)</p>
-</div>
-<div id="renderArea"></div>
+    <div id="info">
+        <br>
+        <p>Audio visualizer written in WebGL and Webkit's audio api.</p> <br>
+        <p>You can either drag an audio file to the canvas or play <a id="sampleMusicLink">some sample music</a>.</p>
+        <p>Needs a browser that supports WebGL and Webkit's audio api to work properly.</p>
+        <p>I'll work on a Firefox version when I find the time.</p><br>
+        <p>=)</p>
+    </div>
+    <div id="renderArea">
+        <div id="loadingMessage">Loading ...</div>
+    </div>
 </body>
 </html>
 

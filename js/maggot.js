@@ -1,4 +1,6 @@
 var Analyzer = (function() {
+    
+    var me = {};
 
     var DEBUG = 0;
 
@@ -22,7 +24,7 @@ var Analyzer = (function() {
         }
     }
 
-    var setSize = function(area) {
+    me.setSize = function(area) {
         var size = {x: window.innerWidth * 0.9 - 360, y: window.innerHeight * 0.95};
         renderer.setSize(size.x, size.y);
         camera.aspect = size.x / size.y;
@@ -31,7 +33,9 @@ var Analyzer = (function() {
         area.style.height = size.y + "px";
     }
 
-    var init = function() {
+    me.init = function() {
+        
+        var that = this;
 
         audioCtx = typeof webkitAudioContext != "undefined" ? new webkitAudioContext() : null;
         mucke = null;
@@ -44,7 +48,7 @@ var Analyzer = (function() {
         window.addEventListener('drop', function(event) {
             event.stopPropagation();
             event.preventDefault();
-            if (!reset()) {
+            if (!that.reset()) {
                 return null;
             }
             Loader.loadFile(event.dataTransfer.files, play, printErrorMessage);
@@ -63,7 +67,7 @@ var Analyzer = (function() {
         camera.position.z = 25;
         scene.addChild(camera);
 
-        setSize(area);
+        this.setSize(area);
 
         // create mesh
         var sphereGeometry = new THREE.SphereGeometry(5, 32, 32);
@@ -83,7 +87,7 @@ var Analyzer = (function() {
 
         window.onresize = function() {
            var area = document.getElementById("renderArea");
-           setSize(area);
+           that.setSize(area);
            renderer.render(scene, camera);
         }
 
@@ -98,7 +102,7 @@ var Analyzer = (function() {
 
     }
 
-    var reset = function() {
+    me.reset = function() {
 
         if (nodes) {
             for (var i=0; i < nodes.length; i++) {
@@ -113,8 +117,13 @@ var Analyzer = (function() {
         }
         return true;
     }
+    
+    me.loadFile = function(filename) {
+        me.reset();
+        Loader.requestFile(filename, play);
+    }
 
-    var processAudioData = function() {
+    me.processAudioData = function() {
 
         var analyzerNode = audioCtx.createAnalyser();
         analyzerNode.fftSize = 2048;
@@ -169,13 +178,20 @@ var Analyzer = (function() {
         }, 50);
     }
 
+    /*
+     * internal
+     * called by the loader
+     */
     var play = function(rawBuffer) {
+        
+        document.getElementById("loadingMessage").style.display = "none";
+        
         var mucke = audioCtx.createBuffer(rawBuffer, false);
         var source = audioCtx.createBufferSource();
         source.buffer = mucke;
         nodes.push(source);
 
-        processAudioData();
+        me.processAudioData();
 
         for (var i=0; i<nodes.length; i++) {
             if (i === nodes.length - 1) {
@@ -193,6 +209,6 @@ var Analyzer = (function() {
         console.log(msg);
     }
 
-    return init;
+    return me;
 
 })();
