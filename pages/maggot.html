@@ -102,18 +102,18 @@
     <script type="text/javascript">
 
     window.onload = function() {
-        
+
         var msg = document.getElementById("loadingMessage");
         msg.style.display = "none";
         Analyzer.init();
-        
+
         document.getElementById("sampleMusicLink").addEventListener("click", function() {
             if (msg.style.display != "none")
                 return;
             msg.style.display = "block";
             Analyzer.loadFile("../content/Hora_Staccato.mp3");
         });
-        
+
     }
 
     </script>
@@ -126,6 +126,9 @@
         <p>You can either drag an audio file to the canvas or play <a id="sampleMusicLink">some sample music</a>.</p>
         <p>Needs a browser that supports WebGL and Webkit's audio api to work properly.</p>
         <p>I'll work on a Firefox version when I find the time.</p><br>
+        <p>Music: <a href="http://en.wikipedia.org/wiki/Hora_staccato">Hora Staccato</a>, interpreted by Elias Goldstein<p>
+        <p> Fork me on <a href="https://github.com/krevert/Algorhythm">GitHub</a></p>
+        <br>
         <p>=)</p>
     </div>
     <div id="renderArea">
